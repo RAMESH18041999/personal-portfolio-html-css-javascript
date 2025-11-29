@@ -1,4 +1,4 @@
-// Smooth scroll + typing headline + reveal on scroll + active link + demo form guard
+// Smooth scroll + typing headline + reveal on scroll + active link + EmailJS contact form
 document.addEventListener('DOMContentLoaded', () => {
   // Smooth scroll
   const navLinks = document.querySelectorAll("nav ul li a[href^='#']");
@@ -96,9 +96,18 @@ document.addEventListener('DOMContentLoaded', () => {
         message: messageInput.value
       };
 
-      // ⚠️ Replace these with your EmailJS values
+      // ✅ Your EmailJS values
       const SERVICE_ID = 'service_zi6uvdl';
       const TEMPLATE_ID = 'template_u1ye658';
+
+      if (typeof emailjs === 'undefined') {
+        alert('Email service not loaded. Please check EmailJS <script> in your HTML.');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
+        }
+        return;
+      }
 
       emailjs
         .send(SERVICE_ID, TEMPLATE_ID, templateParams)
@@ -108,7 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch((error) => {
           console.error('EmailJS error:', error);
-          alert('❌ Failed to send message. Please try again later.');
+          alert(
+            '❌ Failed to send message. Please try again later.\n' +
+            (error.text || error.message || JSON.stringify(error))
+          );
         })
         .finally(() => {
           if (submitBtn) {
