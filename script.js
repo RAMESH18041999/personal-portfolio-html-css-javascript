@@ -69,12 +69,53 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   sections.forEach((s) => observer.observe(s));
 
-  // Prevent demo form submit
+  // ✅ Contact form with EmailJS
   const contactForm = document.querySelector('#contact form');
   if (contactForm) {
+    const nameInput = contactForm.querySelector('#name');
+    const emailInput = contactForm.querySelector('#email');
+    const messageInput = contactForm.querySelector('#message');
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      alert('Thanks! Your message has been captured for demo purposes.');
+
+      if (!nameInput.value || !emailInput.value || !messageInput.value) {
+        alert('Please fill in all fields before submitting.');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+
+      const templateParams = {
+        from_name: nameInput.value,
+        reply_to: emailInput.value,
+        message: messageInput.value
+      };
+
+      // ⚠️ Replace these with your EmailJS values
+      const SERVICE_ID = 'service_zi6uvdl';
+      const TEMPLATE_ID = 'template_u1ye658';
+
+      emailjs
+        .send(SERVICE_ID, TEMPLATE_ID, templateParams)
+        .then(() => {
+          alert('✅ Message sent successfully! I will reply soon.');
+          contactForm.reset();
+        })
+        .catch((error) => {
+          console.error('EmailJS error:', error);
+          alert('❌ Failed to send message. Please try again later.');
+        })
+        .finally(() => {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+          }
+        });
     });
   }
 });
